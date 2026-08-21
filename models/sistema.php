@@ -17,12 +17,12 @@ class Sistema {
             try {
                 $sql = "SELECT id, nombre, email, password FROM usuarios
                         WHERE email = :email LIMIT 1";
-                $sth = $this->_DB->prepare($sql);
-                $sth->bindParam(':email', $correo, PDO::PARAM_STR);
-                $sth->execute();
+                $sth = $this -> _DB -> prepare($sql);
+                $sth -> bindParam(':email', $correo, PDO::PARAM_STR);
+                $sth -> execute();
                 
-                if($sth->rowCount() > 0) {
-                    $usuario = $sth->fetch();
+                if($sth -> rowCount() > 0) {
+                    $usuario = $sth -> fetch();
                     // si la contra coincide con el hash
                     if(password_verify($contrasena, $usuario['password'])) {
                         session_start();
