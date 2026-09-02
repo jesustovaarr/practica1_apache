@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Inserts
+INSERT INTO productos (sku, name, description, price, stock) VALUES
+('PROD-01', 'Teclado', 'Teclado mecánico con retroiluminación RGB.', 1250.00, 15),
+('PROD-02', 'Lampara', 'Lampara con luz automatica segun tus actividades.', 650.50, 25),
+('PROD-03', 'Escritorio', 'Escritorio comodo para tu trabajo.', 5800.00, 8);
+
