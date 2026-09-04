@@ -8,10 +8,10 @@ require_once '../core/Router.php';
 require_once '../resources/v1/UserResource.php';
 require_once '../resources/v1/ProductoResource.php';
 
-$scriptName = dirname($_SERVER['SCRIPT_NAME']);
-$basePath = $scriptName;
+//$scriptName = dirname($_SERVER['SCRIPT_NAME']);
+//$basePath = $scriptName;
 
-$router = new Router('v1', $basePath);
+$router = new Router('v1', '/22030344/api/public');
 $userResource = new UserResource();
 $productoResource = new ProductoResource();
 
