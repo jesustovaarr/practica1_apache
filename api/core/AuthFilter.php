@@ -12,6 +12,10 @@ class AuthFilter {
     }
 
     public function authenticate() {
+        if (strpos($_SERVER['REQUEST_URI'],'/login') !== false) {                               
+            return true;
+        } 
+
         $headers = apache_request_headers();
         $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
 
