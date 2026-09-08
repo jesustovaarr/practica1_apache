@@ -53,7 +53,8 @@ if (strpos($uri, '/api/v2') !== false) {
     //$scriptName = dirname($_SERVER['SCRIPT_NAME']);
     //$basePath = $scriptName;
 
-    $router = new Router('v1', '/22030344/api/public');
+    //$router = new Router('v1', '/22030344/api/public');
+    $router = new Router('v1', '/api/public');
     $userResource = new UserResource();
     $productoResource = new ProductoResource();
 

@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: API de Gestión de Tareas
+  description: |
+    API RESTful diseñada bajo el paradigma **API-First** para la administración de tareas.
+    Cumple con el contrato formal de endpoints y modelos definido previamente a la implementación,
+    integrando el filtro de autenticación basado en tokens Bearer de la arquitectura existente.
+  version: 1.0.0
+  contact:
+    name: Jesús Alejandro Elguera Tovar
+servers:
+  - url: http://localhost:8080/api/public/api/v2
+    description: Servidor local de desarrollo (Apache Docker)
+  - url: http://topicosweb.celaya.tecnm.mx/22030344/api/public/api/v2
+    description: Servidor de la clase (Producción)
+  - url: /api/public/api/v2
+    description: Ruta relativa local
+  - url: /22030344/api/public/api/v2
+    description: Ruta relativa servidor de la clase
+
+security:
+  - bearerAuth: []
+
+paths:
+  /tareas:
+    get:
+      summary: Listar todas las tareas
+      description: Devuelve una lista con todas las tareas registradas en el sistema. Requiere token de autenticación.
+      operationId: getTareas
+      responses:
+        '200':
+          description: Lista de tareas obtenida exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tarea'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Crear una nueva tarea
+      description: Registra una nueva tarea en el sistema. Requiere body con título y estado booleano de completada.
+      operationId: createTarea
+      requestBody:
+        required: true
+        description: Datos para la creación de la tarea
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TareaInput'
+      responses:
+        '201':
+          description: Tarea creada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarea'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tareas/{id}:
+    get:
+      summary: Obtener una tarea por ID
+      description: Devuelve la información detallada de una tarea específica según su identificador numérico.
+      operationId: getTareaById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único de la tarea.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Tarea encontrada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarea'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Actualizar una tarea existente
+      description: Actualiza los datos (título y estado de completada) de una tarea existente identificada por su ID.
+      operationId: updateTarea
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único de la tarea a actualizar.
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        description: Datos actualizados de la tarea
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TareaInput'
+      responses:
+        '200':
+          description: Tarea actualizada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarea'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Tarea:
+      type: object
+      required:
+        - id
+        - titulo
+        - completada
+        - fecha_creacion
+      properties:
+        id:
+          type: integer
+          example: 1
+          description: Identificador numérico único y autoincremental de la tarea.
+        titulo:
+          type: string
+          example: "Estudiar API-First"
+          description: Título o descripción textual de la tarea.
+        completada:
+          type: boolean
+          example: false
+          description: Indicador booleano que determina si la tarea ha sido completada.
+        fecha_creacion:
+          type: string
+          format: date-time
+          example: "2026-09-07T10:00:00Z"
+          description: Marca temporal de creación en formato ISO 8601 UTC.
+
+    TareaInput:
+      type: object
+      required:
+        - titulo
+        - completada
+      properties:
+        titulo:
+          type: string
+          example: "Estudiar API-First"
+          description: Título o descripción de la tarea.
+        completada:
+          type: boolean
+          example: false
+          description: Estado de cumplimiento de la tarea.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "unauthorized"
+        message:
+          type: string
+          example: "Token inválido, expirado o no proporcionado"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+      description: "Token de autenticación Bearer obtenido en el endpoint POST /login"
+
+  responses:
+    UnauthorizedError:
+      description: No autorizado. El token es inválido, expiró o no fue enviado en las cabeceras.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundError:
+      description: Recurso no encontrado.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "not_found"
+              message:
+                type: string
+                example: "Tarea no encontrada"
+    BadRequestError:
+      description: Solicitud incorrecta o datos inválidos.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "bad_request"
+              message:
+                type: string
+                example: "El campo titulo es requerido y completada debe ser un booleano"
+    InternalServerError:
+      description: Error interno del servidor.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "server_error"
+              message:
+                type: string
+                example: "Error interno al procesar la solicitud"
